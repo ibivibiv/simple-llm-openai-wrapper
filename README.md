@@ -109,7 +109,7 @@ flowchart TD
     C --> D{Successful Response?}
     D -- Yes --> E[Post-Process Response]
     E --> F[Return Cleaned Response]
-    D -- No --> G[Retry (max_attempts)]
+    D -- No --> G[Retry: max attempts]
     G -- Exceeded --> H[Try Next Model]
     H --> B
     G -- Success on Retry --> E
