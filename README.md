@@ -37,13 +37,13 @@
 You can install **OpenAI Wrapper** directly from GitHub using pip:
 
 ```bash
-pip install git+https://github.com/yourusername/openai-wrapper.git
+pip install git+https://github.com/ibivibiv/openai-wrapper.git
 ```
 
 For example, to install the latest version from the `main` branch:
 
 ```bash
-pip install git+https://github.com/yourusername/openai-wrapper.git@main
+pip install git+https://github.com/ibivibiv/openai-wrapper.git@main
 ```
 
 ---
