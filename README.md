@@ -125,15 +125,16 @@ The wrapper operates in two main phases:
 ```mermaid
 flowchart TD
     A[Start: Receive API Request] --> B[Loop through Model Configurations]
-    B --> C[Create Client with Model's API Key & Base URL]
-    C --> D[Merge Hyperparameters (Global, Model-specific, Per-call)]
+    B --> C[Create Client with Model API Key and Base URL]
+    C --> D[Merge Hyperparameters: Global, Model-specific, and Per-call]
     D --> E[Call API with Model]
     E --> F{Successful Response?}
     F -- Yes --> G[Post-Process Response]
     G --> H[Return Cleaned Response]
-    F -- No --> I[Retry (max attempts)]
+    F -- No --> I[Retry max attempts]
     I -- Exceeded --> J[Move to Next Model]
     J --> B
+
 ```
 
 This diagram illustrates the flow: creating a client per model configuration, merging hyperparameters, attempting the API call with retries, and post-processing the response.
