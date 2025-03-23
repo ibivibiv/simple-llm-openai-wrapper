@@ -109,16 +109,15 @@ except Exception as e:
 
 The wrapper operates in two main phases:
 
-1. **Model Selection & Retry:**  
+1. **Model Selection, API Call, & Post-Processing with Retry:**  
    For each API call (chat or generate), it cycles through your list of model configurations. For each model, it:
    - Constructs a new client using that model’s specific API key and endpoint (falling back to global settings if not provided).
-   - Combines hyperparameters from global defaults, model-specific defaults, and per-call parameters.
-   - Retries the API call (up to `max_attempts`) before moving on to the next model.
+   - Merges hyperparameters from global defaults, model-specific defaults, and per-call parameters.
+   - Makes the API call and then immediately post-processes the result (removing `<think>...</think>` sections and repairing JSON if enabled).  
+   - The entire operation—both the API call and post-processing—is wrapped in a retry mechanism (up to `max_attempts`). If any error occurs during either stage, it triggers a retry.
 
-2. **Post-Processing:**  
-   After a successful API call, the response is post-processed:
-   - If enabled, `<think>...</think>` sections are removed.
-   - If JSON enforcement is enabled, the response is repaired to produce valid JSON.
+2. If the call fails after all retries for one model, the wrapper moves on to the next model in the list until a successful response is produced.
+
 
 ### Mermaid Diagram: Model Fallback with Multiple Endpoints
 
@@ -128,12 +127,13 @@ flowchart TD
     B --> C[Create Client with Model API Key and Base URL]
     C --> D[Merge Hyperparameters: Global, Model-specific, and Per-call]
     D --> E[Call API with Model]
-    E --> F{Successful Response?}
-    F -- Yes --> G[Post-Process Response]
-    G --> H[Return Cleaned Response]
-    F -- No --> I[Retry max attempts]
+    E --> F[Post-Process Response]
+    F --> G{Successful Output?}
+    G -- Yes --> H[Return Cleaned Response]
+    G -- No --> I[Retry (includes API call and post-processing)]
     I -- Exceeded --> J[Move to Next Model]
     J --> B
+
 
 ```
 
