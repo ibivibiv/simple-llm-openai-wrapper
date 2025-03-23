@@ -119,21 +119,20 @@ The wrapper operates in two main phases:
 2. If the call fails after all retries for one model, the wrapper moves on to the next model in the list until a successful response is produced.
 
 
-### Mermaid Diagram: Model Fallback with Multiple Endpoints
+### Mermaid Diagram: Model Fallback with Retry on Post-Processing
 
 ```mermaid
 flowchart TD
     A[Start: Receive API Request] --> B[Loop through Model Configurations]
-    B --> C[Create Client with Model API Key and Base URL]
+    B --> C[Create Client using Model API Key and Base URL]
     C --> D[Merge Hyperparameters: Global, Model-specific, and Per-call]
     D --> E[Call API with Model]
     E --> F[Post-Process Response]
-    F --> G{Successful Output?}
+    F --> G{Valid Output?}
     G -- Yes --> H[Return Cleaned Response]
-    G -- No --> I[Retry (includes API call and post-processing)]
+    G -- No --> I[Retry Entire Process]
     I -- Exceeded --> J[Move to Next Model]
     J --> B
-
 
 ```
 
