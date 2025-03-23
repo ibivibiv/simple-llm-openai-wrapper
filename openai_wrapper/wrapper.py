@@ -83,4 +83,52 @@ class OpenAIWrapper:
         last_exception = None
         for model_config in self.models:
             effective_api_key = model_config.get("api_key", self.global_api_key)
-            effective_base_url =
+            effective_base_url = model_config.get("base_url", self.global_base_url)
+            effective_json_only = model_config.get("json_only", self.global_json_only)
+            effective_remove_thinking_sections = model_config.get("remove_thinking_sections", self.global_remove_thinking_sections)
+            effective_default_params = {**self.global_default_params, **model_config.get("default_params", {})}
+
+            local_client = openai.OpenAI(api_key=effective_api_key, base_url=effective_base_url)
+            effective_params = {**effective_default_params, **(params or {})}
+
+            try:
+                response = self._retry_wrapper(
+                    self._call_chat,
+                    local_client,
+                    model_config["model"],
+                    messages,
+                    effective_params,
+                    effective_json_only,
+                    effective_remove_thinking_sections
+                )
+                return response
+            except Exception as e:
+                last_exception = e
+        raise last_exception
+
+    def generate(self, prompt: str, params: Optional[Dict[str, Any]] = None) -> str:
+        last_exception = None
+        for model_config in self.models:
+            effective_api_key = model_config.get("api_key", self.global_api_key)
+            effective_base_url = model_config.get("base_url", self.global_base_url)
+            effective_json_only = model_config.get("json_only", self.global_json_only)
+            effective_remove_thinking_sections = model_config.get("remove_thinking_sections", self.global_remove_thinking_sections)
+            effective_default_params = {**self.global_default_params, **model_config.get("default_params", {})}
+
+            local_client = openai.OpenAI(api_key=effective_api_key, base_url=effective_base_url)
+            effective_params = {**effective_default_params, **(params or {})}
+
+            try:
+                response = self._retry_wrapper(
+                    self._call_completion,
+                    local_client,
+                    model_config["model"],
+                    prompt,
+                    effective_params,
+                    effective_json_only,
+                    effective_remove_thinking_sections
+                )
+                return response
+            except Exception as e:
+                last_exception = e
+        raise last_exception
